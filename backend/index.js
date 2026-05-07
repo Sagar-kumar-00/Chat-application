@@ -9,6 +9,16 @@ const messageRoute = require("../backend/routes/messageRoute");
 const friendRoute = require("../backend/routes/friendRoute");
 const userModel = require("./models/userModel");
 
+let io; // Global socket.io instance
+
+// Export function to get io instance
+const getIO = () => {
+  if (!io) {
+    throw new Error("Socket.io not initialized");
+  }
+  return io;
+};
+
 app.use(cors());
 
 dotEnv.config();
@@ -51,7 +61,7 @@ mongoose
 
 // Socket.IO setup
 function setupSocketIO(server) {
-  const io = require("socket.io")(server, {
+  io = require("socket.io")(server, {
     pingTimeout: 1000,
     cors: {
       origin: "*",
@@ -141,3 +151,5 @@ function setupSocketIO(server) {
   });
   });
 }
+
+module.exports = { getIO };

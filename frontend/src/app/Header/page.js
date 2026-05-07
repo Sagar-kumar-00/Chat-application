@@ -79,6 +79,23 @@ const Header = () => {
     }
   }, [user]);
 
+  // Listen for real-time friend request notifications
+  useEffect(() => {
+    if (!socket) return;
+
+    const handleFriendRequest = (request) => {
+      console.log("Friend request received:", request);
+      setFriendRequests((prev) => [request, ...prev]);
+      toast.info(`${request.sender.name} sent you a friend request!`);
+    };
+
+    socket.on("friend request received", handleFriendRequest);
+
+    return () => {
+      socket.off("friend request received", handleFriendRequest);
+    };
+  }, [socket]);
+
   // Send friend request
   const handleSendFriendRequest = async () => {
     const email = friendEmailRef.current?.value;

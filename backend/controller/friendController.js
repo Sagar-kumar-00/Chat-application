@@ -1,5 +1,6 @@
 const User = require("../models/userModel");
 const FriendRequest = require("../models/friendRequestModel");
+const { getIO } = require("../index");
 
 // Send friend request by email
 const sendFriendRequest = async (req, res) => {
@@ -48,6 +49,40 @@ const sendFriendRequest = async (req, res) => {
           message: "Friend request already sent" 
         });
       }
+      
+      // If rejected, allow resending by updating the existing request
+      if (existingRequest.status === "rejected") {
+        existingRequest.sender = senderId;
+        existingRequest.receiver = receiver._id;
+        existingRequest.status = "pending";
+        await existingRequest.save();
+        
+        const populatedRequest = await FriendRequest.findById(existingRequest._id)
+          .populate("sender", "name email pic")
+          .populate("receiver", "name email pic");
+
+        // Emit socket event to receiver
+        try {
+          const io = getIO();
+          io.to(receiver._id.toString()).emit("friend request received", populatedRequest);
+        } catch (socketError) {
+          console.log("Socket not available for real-time notification");
+        }
+
+        return res.status(201).send({
+          success: true,
+          message: "Friend request sent successfully",
+          data: populatedRequest
+        });
+      }
+      
+      // If accepted, they're already friends
+      if (existingRequest.status === "accepted") {
+        return res.status(400).send({ 
+          success: false, 
+          message: "Already friends with this user" 
+        });
+      }
     }
 
     // Create new friend request
@@ -60,6 +95,14 @@ const sendFriendRequest = async (req, res) => {
     const populatedRequest = await FriendRequest.findById(friendRequest._id)
       .populate("sender", "name email pic")
       .populate("receiver", "name email pic");
+
+    // Emit socket event to receiver
+    try {
+      const io = getIO();
+      io.to(receiver._id.toString()).emit("friend request received", populatedRequest);
+    } catch (socketError) {
+      console.log("Socket not available for real-time notification");
+    }
 
     return res.status(201).send({
       success: true,
