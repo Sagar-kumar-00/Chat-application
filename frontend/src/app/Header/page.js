@@ -5,8 +5,10 @@ import Button from "react-bootstrap/Button";
 import { useMyContext } from "../MyContext";
 import axios from "axios";
 import { Api_URL } from "../utils/util";
+import { useRouter } from "next/navigation";
 
 const Header = () => {
+  const router = useRouter();
   const [show, setShow] = useState(false);
   let inputRef = useRef(null);
   const handleShow = () => setShow(true);
@@ -102,6 +104,21 @@ const Header = () => {
       console.error("Error fetching data:", error);
     }
   };
+
+  const handleLogout = () => {
+    // Clear user data from localStorage
+    localStorage.removeItem("token");
+    localStorage.removeItem("userInfo");
+    
+    // Disconnect socket if exists
+    if (socket) {
+      socket.disconnect();
+    }
+    
+    // Redirect to login page
+    router.push("/login");
+  };
+
   return (
     <div className="chat-header">
       <div className="header-left">
@@ -130,6 +147,18 @@ const Header = () => {
             <path d="M16 3.13a4 4 0 0 1 0 7.75"></path>
           </svg>
           New Group
+        </button>
+        <button
+          className="header-btn logout"
+          onClick={handleLogout}
+          title="Logout"
+        >
+          <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+            <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path>
+            <polyline points="16 17 21 12 16 7"></polyline>
+            <line x1="21" y1="12" x2="9" y2="12"></line>
+          </svg>
+          Logout
         </button>
         {notifications.length > 0 && (
           <span className="notification-badge">{notifications.length}</span>

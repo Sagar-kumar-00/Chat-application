@@ -81,7 +81,7 @@ const authUser = async (req, res) => {
   if (!user) {
     return res
       .status(200)
-      .send({ success: false, message: "Invalid Email or Password" });
+      .send({ success: false, message: "User doesn't exist, please Sign up" });
   } else {
     const validPassword = await bcrypt.compare(
       req.body.password,
@@ -91,7 +91,7 @@ const authUser = async (req, res) => {
     if (!validPassword) {
       return res
         .status(200)
-        .send({ message: "Invalid Password", success: false });
+        .send({ message: "Please check your credentials", success: false });
     }
 
     const token = jwt.sign({ id: user._id }, process.env.TOKEN_SECRET);
