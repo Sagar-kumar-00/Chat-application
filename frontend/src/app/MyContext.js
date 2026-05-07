@@ -118,22 +118,33 @@ export const MyContext = ({ children }) => {
 
   useEffect(() => {
     if (user && pathname === "/home") {
-      console.log("Initializing socket for user:", user._id);
+      console.log("🔌 Initializing socket for user:", user._id);
       const newSocket = io(Api_URL);
+      
+      newSocket.on("connect", () => {
+        console.log("✅ Socket connected to server");
+      });
+      
       newSocket.emit("setup", user);
+      console.log("📤 Emitted 'setup' event with user data");
+      
       newSocket.on("connected", (data) => {
-        console.log("Socket connected with ID:", data);
-        console.log("User joined room:", user._id);
+        console.log("✅ Socket connected with ID:", data);
+        console.log("📍 User joined room:", user._id);
         sendSocketID(data);
       });
+      
       newSocket.on("user online", (data) => {
         //when someone comes online
         fetchChats();
       });
+      
       setSocket(newSocket);
+      console.log("✅ Socket set in context state");
 
       return () => {
         if (newSocket) {
+          console.log("🔌 Cleaning up socket connection");
           newSocket.emit("setup leave", user);
           newSocket.disconnect();
         }

@@ -5,6 +5,10 @@ const { getIO } = require("../index");
 // Send friend request by email
 const sendFriendRequest = async (req, res) => {
   try {
+    console.log("\n📨 Friend request API called");
+    console.log("Sender:", req.user._id);
+    console.log("Receiver email:", req.body.email);
+    
     const { email } = req.body;
     const senderId = req.user._id;
 
@@ -64,11 +68,18 @@ const sendFriendRequest = async (req, res) => {
         // Emit socket event to receiver
         try {
           const io = getIO();
-          console.log("Emitting friend request (resend) to room:", receiver._id.toString());
-          io.to(receiver._id.toString()).emit("friend request received", populatedRequest);
+          const receiverRoom = receiver._id.toString();
+          console.log("=== SOCKET DEBUG (RESEND) ===");
+          console.log("Attempting to emit friend request to room:", receiverRoom);
+          
+          const sockets = await io.in(receiverRoom).fetchSockets();
+          console.log(`Found ${sockets.length} socket(s) in room ${receiverRoom}`);
+          
+          io.to(receiverRoom).emit("friend request received", populatedRequest);
           console.log("Socket event emitted successfully");
+          console.log("===================");
         } catch (socketError) {
-          console.log("Socket not available for real-time notification:", socketError.message);
+          console.log("Socket error:", socketError.message);
         }
 
         return res.status(201).send({
@@ -101,12 +112,22 @@ const sendFriendRequest = async (req, res) => {
     // Emit socket event to receiver
     try {
       const io = getIO();
-      console.log("Emitting friend request to room:", receiver._id.toString());
-      console.log("Request data:", populatedRequest);
-      io.to(receiver._id.toString()).emit("friend request received", populatedRequest);
+      const receiverRoom = receiver._id.toString();
+      console.log("=== SOCKET DEBUG ===");
+      console.log("Attempting to emit friend request to room:", receiverRoom);
+      console.log("Sender:", senderId);
+      console.log("Receiver:", receiver._id);
+      console.log("Request ID:", populatedRequest._id);
+      
+      // Check if receiver is in any rooms
+      const sockets = await io.in(receiverRoom).fetchSockets();
+      console.log(`Found ${sockets.length} socket(s) in room ${receiverRoom}`);
+      
+      io.to(receiverRoom).emit("friend request received", populatedRequest);
       console.log("Socket event emitted successfully");
+      console.log("===================");
     } catch (socketError) {
-      console.log("Socket not available for real-time notification:", socketError.message);
+      console.log("Socket error:", socketError.message);
     }
 
     return res.status(201).send({

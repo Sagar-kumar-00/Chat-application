@@ -83,7 +83,9 @@ function setupSocketIO(server) {
   });
 
   socket.on("setup", async (userData) => {
+    console.log("User setting up socket:", userData?._id);
     socket.join(userData?._id);
+    console.log("User joined room:", userData?._id);
     socket.emit("connected", socket.id);
     await userModel.findByIdAndUpdate(
       { _id: userData?._id },
