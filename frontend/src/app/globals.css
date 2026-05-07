@@ -645,11 +645,11 @@ object-fit: cover;
 .chat-layout {
     display: grid;
     grid-template-columns: 360px 1fr;
-    gap: 20px;
+    gap: 0px;
     height: calc(100vh - 160px);
     background: rgb(37, 37, 38);
     border-radius: 16px;
-    overflow: hidden;
+    overflow: visible;
     border: 1px solid rgb(52, 52, 52);
     box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
 }
@@ -658,6 +658,8 @@ object-fit: cover;
 .chat-sidebar {
     background: rgb(32, 32, 33);
     border-right: 1px solid rgb(52, 52, 52);
+    height: 100%;
+    overflow: hidden;
 }
 
 .chat-list-container {
@@ -791,6 +793,7 @@ object-fit: cover;
     flex-direction: column;
     position: relative;
     height: 100%;
+    overflow: hidden;
 }
 
 .mobile-toggle-btn {
@@ -838,10 +841,12 @@ object-fit: cover;
 .messages-area {
     flex: 1;
     overflow-y: auto;
+    overflow-x: hidden;
     padding: 20px;
     display: flex;
     flex-direction: column;
     gap: 16px;
+    min-height: 0;
 }
 
 .messages-area::-webkit-scrollbar {
@@ -953,7 +958,7 @@ object-fit: cover;
 
 /* Message Input */
 .message-input-container {
-    padding: 20px;
+    padding: 8px;
     border-top: 1px solid rgb(52, 52, 52);
     background: rgb(32, 32, 33);
 }

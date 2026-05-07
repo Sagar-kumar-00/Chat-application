@@ -79,27 +79,30 @@ const RightChats = () => {
     }
   };
   console.log(chatId, "ooooooooooooooo", notifications);
+  
   useEffect(() => {
-    socket &&
-      socket.on("message recieved", (newMessageRecieved) => {
-        if (
-          !chatId || // if chat is not selected or doesn't match current chat
-          chatId !== newMessageRecieved.chat._id
-        ) {
-          // if (!notification.includes(newMessageRecieved)) {
-          //   setNotification([newMessageRecieved, ...notification]);
-          //   setFetchAgain(!fetchAgain);
-          // }
-          // props.fetchChats();
-          // fetchChats();
-          console.log("nnnmee", newMessageRecieved);
-          setNotifications([...notifications, newMessageRecieved]);
-        } else {
-          console.log("mmm");
-          setSoloMsgs([...soloMsgs, newMessageRecieved]);
-        }
-      });
-  });
+    if (!socket) return;
+    
+    const handleMessageReceived = (newMessageRecieved) => {
+      if (
+        !chatId || // if chat is not selected or doesn't match current chat
+        chatId !== newMessageRecieved.chat._id
+      ) {
+        console.log("nnnmee - adding notification", newMessageRecieved);
+        setNotifications((prev) => [...prev, newMessageRecieved]);
+      } else {
+        console.log("mmm - message for current chat");
+        setSoloMsgs((prev) => [...prev, newMessageRecieved]);
+      }
+    };
+    
+    socket.on("message recieved", handleMessageReceived);
+    
+    // Cleanup listener on unmount or when dependencies change
+    return () => {
+      socket.off("message recieved", handleMessageReceived);
+    };
+  }, [socket, chatId]);
 
   // useEffect(() => {
   //   socket &&

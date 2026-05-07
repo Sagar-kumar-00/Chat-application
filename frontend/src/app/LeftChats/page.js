@@ -96,8 +96,8 @@ const LeftChats = ({ onChatSelect }) => {
                   }}
                   key={ind}
                 >
-                  {/* Show notification count for this chat */}
-                  {notifications.filter((notif) => notif.chat._id === e._id).length > 0 && (
+                  {/* Show notification count for this chat (only if not currently open) */}
+                  {e._id !== chatId && notifications.filter((notif) => notif.chat._id === e._id).length > 0 && (
                     <span className="chat-notification-badge">
                       {notifications.filter((notif) => notif.chat._id === e._id).length}
                     </span>
