@@ -13,6 +13,18 @@ app.use(cors());
 dotEnv.config();
 
 app.use(express.json());
+
+// Register routes
+app.get("/", (req, res) => {
+  return res.send("WORKING");
+});
+
+app.use("/chat", userRoutes);
+app.use("/mainchat", chatRoutes);
+app.use("/message", messageRoute);
+app.use("/uploads", express.static("uploads"));
+
+// Database connection and server startup
 mongoose.set("strictQuery", true);
 mongoose
   .connect(process.env.DB_URI, {
@@ -35,30 +47,18 @@ mongoose
     process.exit(1);
   });
 
-// app.use("/auth", authRoute);
-
+// Socket.IO setup
 function setupSocketIO(server) {
+  const io = require("socket.io")(server, {
+    pingTimeout: 1000,
+    cors: {
+      origin: "*",
+      // methods: ["GET", "POST", "PUT", "DELETE"],
+      // credentials: true,
+    },
+  });
 
-app.get("/", (req, res) => {
-  return res.send("WORKING");
-});
-
-app.use("/chat", userRoutes);
-app.use("/mainchat", chatRoutes);
-app.use("/message", messageRoute);
-
-const io = require("socket.io")(server, {
-  pingTimeout: 1000,
-  cors: {
-    origin: "*",
-    // methods: ["GET", "POST", "PUT", "DELETE"],
-    // credentials: true,
-  },
-});
-
-app.use("/uploads", express.static("uploads"));
-
-io.on("connection", (socket) => {
+  io.on("connection", (socket) => {
   console.log("Connected to socket.io");
 
   socket.on("disconnect", (reason) => {
@@ -137,4 +137,5 @@ io.on("connection", (socket) => {
     // Perform custom cleanup or other operations
     // For example, you might remove the disconnected socket from a data structure or update a database
   });
-});
+  });
+}
