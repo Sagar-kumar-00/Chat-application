@@ -218,56 +218,56 @@ object-fit: cover;
     display: flex;
     align-items: center;
     justify-content: center;
-    padding: 20px;
+    padding: 10px;
     background: linear-gradient(135deg, #1a1a1b 0%, #2d2d2e 100%);
 }
 
 .signup-card {
     background: rgb(37, 37, 38);
-    border-radius: 20px;
-    padding: 40px;
+    border-radius: 16px;
+    padding: 24px 28px;
     width: 100%;
-    max-width: 480px;
+    max-width: 420px;
     box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
     border: 1px solid rgb(52, 52, 52);
 }
 
 .signup-header {
     text-align: center;
-    margin-bottom: 35px;
+    margin-bottom: 16px;
 }
 
 .signup-header h2 {
-    font-size: 28px;
+    font-size: 24px;
     font-weight: 600;
-    margin-bottom: 8px;
+    margin-bottom: 4px;
     color: #fff;
 }
 
 .signup-subtitle {
     color: #a0a0a0;
-    font-size: 14px;
+    font-size: 12px;
     margin: 0;
 }
 
 .signup-form {
     display: flex;
     flex-direction: column;
-    gap: 20px;
+    gap: 12px;
 }
 
 .profile-upload-section {
     display: flex;
     flex-direction: column;
     align-items: center;
-    margin-bottom: 10px;
+    margin-bottom: 2px;
 }
 
 .profile-image-wrapper {
     position: relative;
-    width: 120px;
-    height: 120px;
-    margin-bottom: 12px;
+    width: 80px;
+    height: 80px;
+    margin-bottom: 6px;
 }
 
 .profile-preview {
@@ -275,7 +275,7 @@ object-fit: cover;
     height: 100%;
     border-radius: 50%;
     object-fit: cover;
-    border: 4px solid #7B61FF;
+    border: 3px solid #7B61FF;
     box-shadow: 0 4px 12px rgba(123, 97, 255, 0.3);
 }
 
@@ -284,8 +284,8 @@ object-fit: cover;
     bottom: 0;
     right: 0;
     background: #7B61FF;
-    width: 40px;
-    height: 40px;
+    width: 32px;
+    height: 32px;
     border-radius: 50%;
     display: flex;
     flex-direction: column;
@@ -313,31 +313,31 @@ object-fit: cover;
 
 .upload-hint {
     color: #a0a0a0;
-    font-size: 12px;
+    font-size: 11px;
     margin: 0;
 }
 
 .form-group {
     display: flex;
     flex-direction: column;
-    gap: 8px;
+    gap: 5px;
 }
 
 .form-label {
     color: #d0d0d0;
-    font-size: 14px;
+    font-size: 12px;
     font-weight: 500;
     margin: 0;
 }
 
 .form-input {
     width: 100%;
-    padding: 14px 18px;
+    padding: 10px 14px;
     background: rgb(52, 52, 52);
     border: 2px solid rgb(63, 63, 63);
-    border-radius: 12px;
+    border-radius: 10px;
     color: #fff;
-    font-size: 15px;
+    font-size: 14px;
     transition: all 0.3s ease;
 }
 
@@ -354,16 +354,16 @@ object-fit: cover;
 
 .signup-button {
     width: 100%;
-    padding: 14px;
+    padding: 11px;
     background: linear-gradient(135deg, #7B61FF 0%, #6650d6 100%);
     border: none;
-    border-radius: 12px;
+    border-radius: 10px;
     color: white;
-    font-size: 16px;
+    font-size: 15px;
     font-weight: 600;
     cursor: pointer;
     transition: all 0.3s ease;
-    margin-top: 10px;
+    margin-top: 4px;
     box-shadow: 0 4px 15px rgba(123, 97, 255, 0.4);
 }
 
@@ -383,7 +383,7 @@ object-fit: cover;
 
 .signup-footer p {
     color: #a0a0a0;
-    font-size: 14px;
+    font-size: 12px;
     margin: 0;
 }
 
@@ -417,56 +417,56 @@ object-fit: cover;
     display: flex;
     align-items: center;
     justify-content: center;
-    padding: 20px;
+    padding: 15px;
     background: linear-gradient(135deg, #1a1a1b 0%, #2d2d2e 100%);
 }
 
 .login-card {
     background: rgb(37, 37, 38);
     border-radius: 20px;
-    padding: 40px;
+    padding: 32px;
     width: 100%;
-    max-width: 440px;
+    max-width: 420px;
     box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
     border: 1px solid rgb(52, 52, 52);
 }
 
 .login-header {
     text-align: center;
-    margin-bottom: 35px;
+    margin-bottom: 28px;
 }
 
 .login-header h2 {
-    font-size: 28px;
+    font-size: 26px;
     font-weight: 600;
-    margin-bottom: 8px;
+    margin-bottom: 6px;
     color: #fff;
 }
 
 .login-subtitle {
     color: #a0a0a0;
-    font-size: 14px;
+    font-size: 13px;
     margin: 0;
 }
 
 .login-form {
     display: flex;
     flex-direction: column;
-    gap: 20px;
+    gap: 16px;
 }
 
 .login-button {
     width: 100%;
-    padding: 14px;
+    padding: 12px;
     background: linear-gradient(135deg, #7B61FF 0%, #6650d6 100%);
     border: none;
     border-radius: 12px;
     color: white;
-    font-size: 16px;
+    font-size: 15px;
     font-weight: 600;
     cursor: pointer;
     transition: all 0.3s ease;
-    margin-top: 10px;
+    margin-top: 8px;
     box-shadow: 0 4px 15px rgba(123, 97, 255, 0.4);
 }
 
@@ -481,12 +481,12 @@ object-fit: cover;
 
 .login-footer {
     text-align: center;
-    margin-top: 10px;
+    margin-top: 12px;
 }
 
 .login-footer p {
     color: #a0a0a0;
-    font-size: 14px;
+    font-size: 13px;
     margin: 0;
 }
 

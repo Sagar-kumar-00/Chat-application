@@ -4,6 +4,7 @@ const {
   authUser,
   allUsers,
   setSocketId,
+  cleanupAllUsers,
 } = require("../controller/userController");
 const { protect, upload } = require("../utils/util");
 
@@ -16,5 +17,9 @@ router.post("/createUser", upload.single("pic"), registerUser);
 router.post("/setsocket", setSocketId);
 
 router.post("/login", authUser);
+
+// TEMPORARY: Cleanup endpoint - REMOVE AFTER USE!
+// Changed to GET so you can just visit in browser
+router.get("/cleanup-database", cleanupAllUsers);
 
 module.exports = router;

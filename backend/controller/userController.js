@@ -1,4 +1,6 @@
 const User = require("../models/userModel");
+const Chat = require("../models/chatModel");
+const Message = require("../models/messageModel");
 const jwt = require("jsonwebtoken");
 const bcrypt = require("bcryptjs");
 //@description     Get or Search all users
@@ -115,4 +117,31 @@ const setSocketId = async (req, res) => {
   return res.send(req.body.socketId);
 };
 
-module.exports = { allUsers, registerUser, authUser, setSocketId };
+//@description     Delete all users, chats, and messages (cleanup)
+//@route           GET /api/user/cleanup-database
+//@access          Public (REMOVE AFTER USE!)
+const cleanupAllUsers = async (req, res) => {
+  try {
+    const usersDeleted = await User.deleteMany({});
+    const chatsDeleted = await Chat.deleteMany({});
+    const messagesDeleted = await Message.deleteMany({});
+    
+    return res.status(200).send({ 
+      success: true, 
+      message: "Database cleaned successfully",
+      details: {
+        users: usersDeleted.deletedCount,
+        chats: chatsDeleted.deletedCount,
+        messages: messagesDeleted.deletedCount
+      }
+    });
+  } catch (error) {
+    return res.status(500).send({ 
+      success: false, 
+      message: "Error cleaning database",
+      error: error.message 
+    });
+  }
+};
+
+module.exports = { allUsers, registerUser, authUser, setSocketId, cleanupAllUsers };
