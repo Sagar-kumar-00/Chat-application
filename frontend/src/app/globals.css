@@ -568,6 +568,13 @@ object-fit: cover;
     position: relative;
 }
 
+.header-actions-wrapper {
+    display: flex;
+    gap: 12px;
+    align-items: center;
+    position: relative;
+}
+
 .header-btn {
     display: flex;
     align-items: center;
@@ -694,6 +701,7 @@ object-fit: cover;
     cursor: pointer;
     border-bottom: 1px solid rgb(42, 42, 43);
     transition: all 0.2s ease;
+    position: relative;
 }
 
 .chat-item:hover {
@@ -703,6 +711,23 @@ object-fit: cover;
 .chat-item.active {
     background: rgb(52, 52, 52);
     border-left: 3px solid #7B61FF;
+}
+
+.chat-notification-badge {
+    position: absolute;
+    top: 12px;
+    right: 12px;
+    background: #7B61FF;
+    color: white;
+    border-radius: 50%;
+    width: 24px;
+    height: 24px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 12px;
+    font-weight: 600;
+    box-shadow: 0 2px 8px rgba(123, 97, 255, 0.4);
 }
 
 .chat-item-content {

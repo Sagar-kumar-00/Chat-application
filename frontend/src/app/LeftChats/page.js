@@ -15,6 +15,8 @@ const LeftChats = ({ onChatSelect }) => {
     activeChatUsers,
     setActiveChatUsers,
     socket,
+    notifications,
+    setNotifications,
   } = useMyContext();
 
   const [newUserJoined, setNewUserJoined] = useState(null);
@@ -80,6 +82,13 @@ const LeftChats = ({ onChatSelect }) => {
                     socket.emit("join chat", e._id);
                     let data = e.users.map((ele) => ele._id);
                     setActiveChatUsers(data);
+                    
+                    // Clear notifications for this chat
+                    const filteredNotifications = notifications.filter(
+                      (notif) => notif.chat._id !== e._id
+                    );
+                    setNotifications(filteredNotifications);
+                    
                     // Call onChatSelect to close sidebar on mobile
                     if (onChatSelect) {
                       onChatSelect();
@@ -87,6 +96,13 @@ const LeftChats = ({ onChatSelect }) => {
                   }}
                   key={ind}
                 >
+                  {/* Show notification count for this chat */}
+                  {notifications.filter((notif) => notif.chat._id === e._id).length > 0 && (
+                    <span className="chat-notification-badge">
+                      {notifications.filter((notif) => notif.chat._id === e._id).length}
+                    </span>
+                  )}
+                  
                   {e.isGroupChat && (
                     <div className="chat-item-content">
                       <img

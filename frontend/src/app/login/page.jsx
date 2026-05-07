@@ -44,7 +44,7 @@ const Login = () => {
       .then((e) => {
         if (!e.data.success) {
           setLoading(false);
-          toast.error("Please check your credentials");
+          toast.error(e.data.message || "Login failed");
           return;
         } else {
           localStorage.setItem("token", e.data.data.token);
