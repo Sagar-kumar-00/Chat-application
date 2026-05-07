@@ -81,10 +81,15 @@ const Header = () => {
 
   // Listen for real-time friend request notifications
   useEffect(() => {
-    if (!socket) return;
+    if (!socket) {
+      console.log("Socket not available yet");
+      return;
+    }
+
+    console.log("Setting up friend request listener on socket");
 
     const handleFriendRequest = (request) => {
-      console.log("Friend request received:", request);
+      console.log("Friend request received via socket:", request);
       setFriendRequests((prev) => [request, ...prev]);
       toast.info(`${request.sender.name} sent you a friend request!`);
     };
@@ -204,6 +209,7 @@ const Header = () => {
     // Clear user data from localStorage
     localStorage.removeItem("token");
     localStorage.removeItem("userInfo");
+    localStorage.removeItem("loggedUser");
     
     // Disconnect socket if exists
     if (socket) {

@@ -31,6 +31,7 @@ const sendMessage = async (req, res) => {
     sender: req.user._id,
     content: content,
     chat: chatId,
+    readBy: [req.user._id], // Sender automatically marked as read
   };
 
   try {
@@ -75,4 +76,78 @@ const deleteMessage = async (req, res) => {
   }
 };
 
-module.exports = { allMessages, sendMessage, deleteMessage };
+module.exports = { allMessages, sendMessage, deleteMessage, getUnreadCounts, markMessagesAsRead };
+
+// Get unread message counts for all chats of a user
+const getUnreadCounts = async (req, res) => {
+  try {
+    const userId = req.user._id;
+    
+    // Get all chats for this user
+    const chats = await Chat.find({
+      users: { $elemMatch: { $eq: userId } }
+    });
+
+    const unreadCounts = {};
+
+    // For each chat, count unread messages
+    for (const chat of chats) {
+      const unreadCount = await Message.countDocuments({
+        chat: chat._id,
+        readBy: { $ne: userId }, // Messages not in readBy array for this user
+      });
+      
+      if (unreadCount > 0) {
+        unreadCounts[chat._id.toString()] = unreadCount;
+      }
+    }
+
+    return res.status(200).send({ 
+      success: true, 
+      data: unreadCounts 
+    });
+  } catch (error) {
+    console.error("Error getting unread counts:", error);
+    return res.status(500).send({ 
+      success: false, 
+      message: "Error fetching unread counts" 
+    });
+  }
+};
+
+// Mark all messages in a chat as read by the user
+const markMessagesAsRead = async (req, res) => {
+  try {
+    const { chatId } = req.body;
+    const userId = req.user._id;
+
+    if (!chatId) {
+      return res.status(400).send({ 
+        success: false, 
+        message: "Chat ID required" 
+      });
+    }
+
+    // Update all messages in this chat to add userId to readBy if not already there
+    await Message.updateMany(
+      { 
+        chat: chatId,
+        readBy: { $ne: userId }
+      },
+      { 
+        $addToSet: { readBy: userId }
+      }
+    );
+
+    return res.status(200).send({ 
+      success: true, 
+      message: "Messages marked as read" 
+    });
+  } catch (error) {
+    console.error("Error marking messages as read:", error);
+    return res.status(500).send({ 
+      success: false, 
+      message: "Error marking messages as read" 
+    });
+  }
+};

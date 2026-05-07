@@ -30,6 +30,20 @@ const LeftChats = ({ onChatSelect }) => {
     },
   };
 
+  // Mark messages as read in backend
+  const markChatAsRead = async (chatId) => {
+    try {
+      await axios.post(
+        `${Api_URL}/message/markAsRead`,
+        { chatId },
+        config
+      );
+      console.log(`Marked chat ${chatId} as read in backend`);
+    } catch (error) {
+      console.error("Error marking chat as read:", error);
+    }
+  };
+
   const fetchChats = useCallback(async () => {
     try {
       const { data } = await axios.post(
@@ -74,7 +88,7 @@ const LeftChats = ({ onChatSelect }) => {
               return (
                 <div
                   className={`chat-item ${e._id === chatId ? "active" : ""}`}
-                  onClick={() => {
+                  onClick={async () => {
                     if (chatId) {
                       socket.emit("leave chat", chatId);
                     }
@@ -83,7 +97,10 @@ const LeftChats = ({ onChatSelect }) => {
                     let data = e.users.map((ele) => ele._id);
                     setActiveChatUsers(data);
                     
-                    // Clear notifications for this chat
+                    // Mark messages as read in backend
+                    await markChatAsRead(e._id);
+                    
+                    // Clear notifications for this chat in frontend
                     const filteredNotifications = notifications.filter(
                       (notif) => notif.chat._id !== e._id
                     );

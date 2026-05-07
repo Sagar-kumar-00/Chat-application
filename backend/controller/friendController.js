@@ -64,9 +64,11 @@ const sendFriendRequest = async (req, res) => {
         // Emit socket event to receiver
         try {
           const io = getIO();
+          console.log("Emitting friend request (resend) to room:", receiver._id.toString());
           io.to(receiver._id.toString()).emit("friend request received", populatedRequest);
+          console.log("Socket event emitted successfully");
         } catch (socketError) {
-          console.log("Socket not available for real-time notification");
+          console.log("Socket not available for real-time notification:", socketError.message);
         }
 
         return res.status(201).send({
@@ -99,9 +101,12 @@ const sendFriendRequest = async (req, res) => {
     // Emit socket event to receiver
     try {
       const io = getIO();
+      console.log("Emitting friend request to room:", receiver._id.toString());
+      console.log("Request data:", populatedRequest);
       io.to(receiver._id.toString()).emit("friend request received", populatedRequest);
+      console.log("Socket event emitted successfully");
     } catch (socketError) {
-      console.log("Socket not available for real-time notification");
+      console.log("Socket not available for real-time notification:", socketError.message);
     }
 
     return res.status(201).send({

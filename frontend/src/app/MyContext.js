@@ -7,7 +7,7 @@ const ChatContext = createContext();
 import io from "socket.io-client";
 import { Api_URL } from "./utils/util";
 import axios from "axios";
-let socket;
+
 export const MyContext = ({ children }) => {
   const [selectedChat, setSelectedChat] = useState();
   const [user, setUser] = useState();
@@ -22,7 +22,8 @@ export const MyContext = ({ children }) => {
   const pathname = usePathname();
   const [socketId, setSocketId] = useState(null);
   const [notifications, setNotifications] = useState([]);
-  const[loading,setLoading] = useState(false)
+  const[loading,setLoading] = useState(false);
+  const [socket, setSocket] = useState(null);
 
   useEffect(() => {
     const userInfo = JSON.parse(localStorage.getItem("loggedUser"));
@@ -30,6 +31,7 @@ export const MyContext = ({ children }) => {
       setUser(userInfo);
     }
   }, []);
+  
   const config = {
     headers: {
       "Content-type": "application/json",
@@ -38,6 +40,33 @@ export const MyContext = ({ children }) => {
       }`,
     },
   };
+
+  // Fetch unread counts from backend when user logs in
+  const fetchUnreadCounts = async () => {
+    try {
+      const { data } = await axios.get(`${Api_URL}/message/unreadCounts`, config);
+      if (data.success) {
+        console.log("Fetched unread counts from backend:", data.data);
+        // Convert unread counts object to notifications array for compatibility
+        const notificationsArray = [];
+        Object.entries(data.data).forEach(([chatId, count]) => {
+          // Add placeholder notifications for each chat with unread count
+          for (let i = 0; i < count; i++) {
+            notificationsArray.push({ chat: { _id: chatId } });
+          }
+        });
+        setNotifications(notificationsArray);
+      }
+    } catch (error) {
+      console.error("Error fetching unread counts:", error);
+    }
+  };
+
+  useEffect(() => {
+    if (user && pathname === "/home") {
+      fetchUnreadCounts();
+    }
+  }, [user?._id, pathname]);
 
   const fetchChats = async () => {
     try {
@@ -89,19 +118,34 @@ export const MyContext = ({ children }) => {
 
   useEffect(() => {
     if (user && pathname === "/home") {
-      socket = io(Api_URL);
-      socket.emit("setup", user);
-      socket.on("connected", (data) => {
+      console.log("Initializing socket for user:", user._id);
+      const newSocket = io(Api_URL);
+      newSocket.emit("setup", user);
+      newSocket.on("connected", (data) => {
+        console.log("Socket connected with ID:", data);
+        console.log("User joined room:", user._id);
         sendSocketID(data);
       });
-      socket.on("user online", (data) => {
+      newSocket.on("user online", (data) => {
         //when someone comes online
         fetchChats();
       });
+      setSocket(newSocket);
+
+      return () => {
+        if (newSocket) {
+          newSocket.emit("setup leave", user);
+          newSocket.disconnect();
+        }
+      };
     } else {
-      socket && user && socket.emit("setup leave", user);
+      if (socket) {
+        socket.emit("setup leave", user);
+        socket.disconnect();
+        setSocket(null);
+      }
     }
-  }, [`${user}`, pathname]);
+  }, [user?._id, pathname]);
 
   return (
     <>
@@ -131,7 +175,8 @@ export const MyContext = ({ children }) => {
           socketId,
           notifications,
           setNotifications,
-          loading,setLoading
+          loading,setLoading,
+          fetchUnreadCounts
         }}
       >
         {children}
