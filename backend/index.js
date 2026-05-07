@@ -19,13 +19,25 @@ mongoose
     useNewUrlParser: true,
     useUnifiedTopology: true,
   })
-  .then((e) => console.log("CONNECTED TO SERVERrrrrrrr"));
+  .then(() => {
+    console.log("✅ Connected to MongoDB successfully");
+    
+    // Start server only after DB connection is successful
+    const server = app.listen(process.env.DB_PORT, () => {
+      console.log(`✅ Server is running on port ${process.env.DB_PORT}`);
+    });
+    
+    setupSocketIO(server);
+  })
+  .catch((err) => {
+    console.error("❌ MongoDB connection error:", err.message);
+    console.error("Make sure MongoDB is running and DB_URI in .env is correct");
+    process.exit(1);
+  });
 
 // app.use("/auth", authRoute);
 
-const server = app.listen(process.env.DB_PORT, (req, res) =>
-  console.log("SERVER IS RUNNING !!!!!!!!!!!!")
-);
+function setupSocketIO(server) {
 
 app.get("/", (req, res) => {
   return res.send("WORKING");

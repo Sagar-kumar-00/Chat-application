@@ -145,67 +145,79 @@ const RightChats = () => {
   };
   return (
     <>
-      <div className="chatDataside position-relative">
-        <div className="chatHistory">
-          {console.log(soloMsgs.length,chatId,'check')}
-          {chats && !chats.length && <p> No Chats, Get Started Now !!</p>}
+      <div className="chat-messages-container">
+        <div className="messages-area">
+          {chats && !chats.length && (
+            <div className="empty-state">
+              <svg xmlns="http://www.w3.org/2000/svg" width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+                <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path>
+              </svg>
+              <h3>No Chats Yet</h3>
+              <p>Start a new conversation to begin chatting</p>
+            </div>
+          )}
           {chatId && (
             <>
               {soloMsgs && soloMsgs.length > 0 ? (
                 soloMsgs.map((ele, ind) => {
                   return (
-                    <div id={`ActiveMessage_${ind}`}>
+                    <div id={`ActiveMessage_${ind}`} key={ind}>
                       {ele.sender._id === user._id ? (
-                        <div className="userMessage d-flex justify-content-end gap-3 align-items-center">
-                          <p className="m-0" key={Math.random()}>
-                            {ele.content}
-                          </p>
-                          <span
-                            onClick={() => handleDeleteMessage(ele._id, ind)}
-                          >
-                            x
-                          </span>
-
-                          {/* <img src={ele.sender.pic} width={50} /> */}
+                        <div className="message-sent">
+                          <div className="message-bubble sent">
+                            <p>{ele.content}</p>
+                            <button
+                              className="delete-btn"
+                              onClick={() => handleDeleteMessage(ele._id, ind)}
+                              title="Delete message"
+                            >
+                              <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                                <polyline points="3 6 5 6 21 6"></polyline>
+                                <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
+                              </svg>
+                            </button>
+                          </div>
                         </div>
                       ) : (
-                        <div className="ClientMessage d-flex justify-content-start  gap-3 align-items-center">
+                        <div className="message-received">
                           <img
-                            width={40}
-                            height={40}
-                            style={{ borderRadius: "50%", objectFit: "cover" }}
+                            className="message-avatar"
                             src={`${Api_URL}/uploads/${ele.sender.pic}`}
+                            alt={ele.sender.name}
                           />
-
-                          <p key={Math.random()}>{ele.content}</p>
+                          <div className="message-bubble received">
+                            <p>{ele.content}</p>
+                          </div>
                         </div>
                       )}
                     </div>
                   );
                 })
               ) : (
-                <div
-                  style={{
-                    display: "flex",
-                    justifyContent: "center",
-                    alignItems: "center",
-                    width: "100%",
-                    height: "100%",
-                  }}
-                >
-                  <p>Start Chatting with each other</p>
+                <div className="empty-chat">
+                  <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+                    <path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"></path>
+                  </svg>
+                  <p>Start your conversation</p>
                 </div>
               )}
             </>
           )}
         </div>
         {chatId && (
-          <div className="chatDiv">
-            <form onSubmit={sendSingleMessage}>
-              <div style={{ display: "flex" }}>
-                <input className="ChatInput shadow-2" ref={inputRef} />
-                <button className="chat-Send-Btn shadow-2">Go</button>
-              </div>
+          <div className="message-input-container">
+            <form onSubmit={sendSingleMessage} className="message-form">
+              <input
+                className="message-input"
+                placeholder="Type a message..."
+                ref={inputRef}
+              />
+              <button type="submit" className="send-button">
+                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                  <line x1="22" y1="2" x2="11" y2="13"></line>
+                  <polygon points="22 2 15 22 11 13 2 9 22 2"></polygon>
+                </svg>
+              </button>
             </form>
           </div>
         )}

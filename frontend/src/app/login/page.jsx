@@ -2,24 +2,23 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
 import { useRouter } from "next/navigation";
+import Link from "next/link";
 import { useMyContext } from "../MyContext";
 import { Api_URL } from "../utils/util";
 import { toast } from "react-toastify";
 import Loader from "../utils/Loader";
-// import "react-toastify/dist/react-toastify.css";
 
 const Login = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const router = useRouter();
-  const { setUser,loading,setLoading } = useMyContext();
+  const { setUser, loading, setLoading } = useMyContext();
 
-  useEffect(()=>{
-
-    return (()=>{
-      setLoading(false)
-    })
-  },[])
+  useEffect(() => {
+    return () => {
+      setLoading(false);
+    };
+  }, []);
 
   const config = {
     headers: {
@@ -29,7 +28,13 @@ const Login = () => {
 
   async function handleSubmit(e) {
     e.preventDefault();
-    setLoading(true)
+    
+    if (!email || !password) {
+      toast.info('Please fill all fields');
+      return;
+    }
+    
+    setLoading(true);
     const data = await axios
       .post(
         `${Api_URL}/chat/login`,
@@ -38,8 +43,7 @@ const Login = () => {
       )
       .then((e) => {
         if (!e.data.success) {
-          setLoading(false)
-
+          setLoading(false);
           toast.error("Please check your credentials");
           return;
         } else {
@@ -50,43 +54,66 @@ const Login = () => {
           setTimeout(() => {
             router.push("/home");
           }, 100);
-          // setLoading(false)
-
         }
       });
   }
+  
   return (
     <>
-      <div className="container">
-        <div className="row justify-content-center align-items-center">
-          <div className="col-md-4 lg-6">
-       
-
-            <div className="LoginPage">
-              <form className="" onSubmit={handleSubmit}>
-                <input
-                  className="ChatInput w-100"
-                  placeholder="EMAIL"
-                  onChange={(e) => setEmail(e.target.value)}
-                />
-
-                <input
-                  className="ChatInput w-100"
-                  placeholder="Pass"
-                  type="password"
-                  onChange={(e) => setPassword(e.target.value)}
-                />
-                <button className="btn bg-voilet rounded-1  w-50 m-auto d-block">
-                  Login
-                </button>
-              </form>
-            </div>
+      <div className="login-container">
+        <div className="login-card">
+          <div className="login-header">
+            <h2>Welcome Back</h2>
+            <p className="login-subtitle">Sign in to continue chatting</p>
           </div>
+
+          <form className="login-form" onSubmit={handleSubmit}>
+            <div className="form-group">
+              <label htmlFor="email" className="form-label">
+                Email
+              </label>
+              <input
+                id="email"
+                className="form-input"
+                placeholder="Enter your email"
+                type="email"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                required
+              />
+            </div>
+
+            <div className="form-group">
+              <label htmlFor="password" className="form-label">
+                Password
+              </label>
+              <input
+                id="password"
+                className="form-input"
+                placeholder="Enter your password"
+                type="password"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                required
+              />
+            </div>
+
+            <button type="submit" className="login-button">
+              Login
+            </button>
+
+            <div className="login-footer">
+              <p>
+                Don't have an account?
+                <Link href="/signup" className="signup-link">
+                  Sign Up
+                </Link>
+              </p>
+            </div>
+          </form>
         </div>
       </div>
-      {loading && <Loader/>}
-
-      {/* SignUP */}
+      {loading && <Loader />}
     </>
   );
 };

@@ -23,9 +23,8 @@ const Header = () => {
 
   const {
     setChatId,
-
+    user,
     socket,
-
     chats,
     setChats,
     allUsers,
@@ -104,40 +103,66 @@ const Header = () => {
     }
   };
   return (
-    <div className="container">
-      <button
-        className="btn btn-primary bg-voilet rounded-2"
-        onClick={handleNewChat}
-      >
-        New Chat +{" "}
-      </button>
-      <button
-        className="btn btn-success mx-3 rounded-2"
-        onClick={handleNewGroupChat}
-      >
-        New GROUP Chat +{" "}
-      </button>
-      {notifications.length}
-      <div>
-        <Modal show={show} onHide={handleClose}>
-          <Modal.Body>
+    <div className="chat-header">
+      <div className="header-left">
+        <h1 className="app-title">Chat App</h1>
+        {user && <p className="user-greeting">Welcome, {user.name}!</p>}
+      </div>
+      
+      <div className="header-actions">
+        <button
+          className="header-btn primary"
+          onClick={handleNewChat}
+        >
+          <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+            <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path>
+          </svg>
+          New Chat
+        </button>
+        <button
+          className="header-btn secondary"
+          onClick={handleNewGroupChat}
+        >
+          <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+            <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
+            <circle cx="9" cy="7" r="4"></circle>
+            <path d="M23 21v-2a4 4 0 0 0-3-3.87"></path>
+            <path d="M16 3.13a4 4 0 0 1 0 7.75"></path>
+          </svg>
+          New Group
+        </button>
+        {notifications.length > 0 && (
+          <span className="notification-badge">{notifications.length}</span>
+        )}
+      </div>
+
+      <Modal show={show} onHide={handleClose} centered className="custom-modal">
+        <Modal.Header closeButton>
+          <Modal.Title>{isGroupChat ? 'Create Group Chat' : 'Start New Chat'}</Modal.Title>
+        </Modal.Header>
+        <Modal.Body>
+          <div className="users-list">
             {allUsers &&
               allUsers.map((e, ind) => {
                 return (
-                  <div key={e._id}>
+                  <div key={e._id} className="user-item">
                     {!isGroupChat ? (
-                      <div key={ind}>
-                        <button
-                          className="btn btn-primary"
-                          onClick={() => createNewChat(e._id)}
-                        >
-                          {e.name}
-                        </button>
+                      <div
+                        className="user-card"
+                        onClick={() => createNewChat(e._id)}
+                      >
+                        <img
+                          src={`${Api_URL}/uploads/${e.pic}`}
+                          alt={e.name}
+                          className="user-avatar-small"
+                        />
+                        <span className="user-name">{e.name}</span>
                       </div>
                     ) : (
-                      <div>
+                      <div className="user-checkbox">
                         <input
                           type="checkbox"
+                          id={`user-${e._id}`}
                           name={e.name}
                           value={e._id}
                           onChange={() => {
@@ -150,22 +175,34 @@ const Header = () => {
                             }
                           }}
                         />
-                        <label className="btn btn-primary">{e.name}</label>
-                        <br />
+                        <label htmlFor={`user-${e._id}`} className="checkbox-label">
+                          <img
+                            src={`${Api_URL}/uploads/${e.pic}`}
+                            alt={e.name}
+                            className="user-avatar-small"
+                          />
+                          {e.name}
+                        </label>
                       </div>
                     )}
                   </div>
                 );
               })}
-            {isGroupChat && (
-              <div>
-                <input ref={inputRef} />
-                <button onClick={createNewGroupChat}>CREATE GROUP CHAT</button>
-              </div>
-            )}
-          </Modal.Body>
-        </Modal>
-      </div>
+          </div>
+          {isGroupChat && (
+            <div className="group-creation">
+              <input
+                ref={inputRef}
+                placeholder="Enter group name"
+                className="group-name-input"
+              />
+              <button onClick={createNewGroupChat} className="create-group-btn">
+                Create Group
+              </button>
+            </div>
+          )}
+        </Modal.Body>
+      </Modal>
     </div>
   );
 };

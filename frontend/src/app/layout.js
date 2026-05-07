@@ -15,6 +15,7 @@ export default function RootLayout({ children }) {
           integrity="sha384-KK94CHFLLe+nY2dmCWGMq91rCGa5gtU4mk92HdvYe+M/SXH301p5ILy+dN9+nJOZ"
           crossorigin="anonymous"
         />
+        <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/geist@1.0.0/dist/font.css" />
       </Head>
       <body>
         <ToastProvider>

@@ -39,12 +39,18 @@ const registerUser = async (req, res) => {
   const salt = await bcrypt.genSalt(5); //complexity of salt generation
   const hashpassword = await bcrypt.hash(req.body.password, salt); // password hashing
 
-  const user = await User.create({
+  const userData = {
     name,
     email,
     password: hashpassword,
-    pic: req.file.filename,
-  });
+  };
+
+  // Only add pic if file was uploaded
+  if (req.file) {
+    userData.pic = req.file.filename;
+  }
+
+  const user = await User.create(userData);
 
   if (user) {
     const token = jwt.sign({ id: user._id }, process.env.TOKEN_SECRET);
