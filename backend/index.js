@@ -6,6 +6,7 @@ const cors = require("cors");
 const userRoutes = require("../backend/routes/userRoutes");
 const chatRoutes = require("../backend/routes/chatRoute");
 const messageRoute = require("../backend/routes/messageRoute");
+const friendRoute = require("../backend/routes/friendRoute");
 const userModel = require("./models/userModel");
 
 app.use(cors());
@@ -22,6 +23,7 @@ app.get("/", (req, res) => {
 app.use("/chat", userRoutes);
 app.use("/mainchat", chatRoutes);
 app.use("/message", messageRoute);
+app.use("/friend", friendRoute);
 app.use("/uploads", express.static("uploads"));
 
 // Database connection and server startup
