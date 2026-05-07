@@ -76,8 +76,6 @@ const deleteMessage = async (req, res) => {
   }
 };
 
-module.exports = { allMessages, sendMessage, deleteMessage, getUnreadCounts, markMessagesAsRead };
-
 // Get unread message counts for all chats of a user
 const getUnreadCounts = async (req, res) => {
   try {
@@ -151,3 +149,5 @@ const markMessagesAsRead = async (req, res) => {
     });
   }
 };
+
+module.exports = { allMessages, sendMessage, deleteMessage, getUnreadCounts, markMessagesAsRead };
