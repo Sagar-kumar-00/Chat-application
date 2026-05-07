@@ -34,6 +34,29 @@ const Login = () => {
       return;
     }
     
+    // Test/Demo user - no backend authentication
+    if (email === "dummy@gmail.com" && password === "dummy") {
+      const dummyUser = {
+        _id: "demo-user-123",
+        name: "Demo User",
+        email: "dummy@gmail.com",
+        pic: "default-avatar.png",
+        isAdmin: false,
+        token: "demo-token-no-auth"
+      };
+      
+      localStorage.setItem("token", dummyUser.token);
+      localStorage.setItem("loggedUser", JSON.stringify(dummyUser));
+      setUser(dummyUser);
+      
+      toast.success("Logged in as Demo User (Local Mode)");
+      
+      setTimeout(() => {
+        router.push("/home");
+      }, 100);
+      return;
+    }
+    
     setLoading(true);
     const data = await axios
       .post(
@@ -101,6 +124,12 @@ const Login = () => {
             <button type="submit" className="login-button">
               Login
             </button>
+
+            <div className="demo-info">
+              <p className="demo-text">
+                <strong>Demo Mode:</strong> dummy@gmail.com / dummy
+              </p>
+            </div>
 
             <div className="login-footer">
               <p>

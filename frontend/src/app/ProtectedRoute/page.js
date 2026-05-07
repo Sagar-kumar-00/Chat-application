@@ -9,7 +9,7 @@ const Protected = (WrappedComponent) => {
 
     // Simulated authentication check
     const isAuthenticated = () => {
-      let token = false;
+      let token = true;
       if (typeof window !== "undefined" && localStorage.getItem("token")) {
         token = true;
       }
