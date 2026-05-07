@@ -6,20 +6,28 @@ import { useMyContext } from "../MyContext";
 import axios from "axios";
 import { Api_URL } from "../utils/util";
 import { useRouter } from "next/navigation";
+import { toast } from "react-toastify";
 
 const Header = () => {
   const router = useRouter();
   const [show, setShow] = useState(false);
+  const [showAddFriend, setShowAddFriend] = useState(false);
+  const [showRequests, setShowRequests] = useState(false);
   let inputRef = useRef(null);
-  const handleShow = () => setShow(true);
+  let friendEmailRef = useRef(null);
   const [isGroupChat, setIsGroupChat] = useState(false);
   const [groupIds, setGroupIds] = useState([]);
+  const [friends, setFriends] = useState([]);
+  const [friendRequests, setFriendRequests] = useState([]);
+  
+  const handleShow = () => setShow(true);
   const handleClose = () => {
     setShow(false);
     setIsGroupChat(false);
     setGroupIds([]);
   };
   const handleNewChat = () => {
+    fetchFriends(); // Fetch friends when opening new chat
     handleShow();
   };
 
@@ -29,9 +37,6 @@ const Header = () => {
     socket,
     chats,
     setChats,
-    allUsers,
-    setAllUsers,
-    notifications,
   } = useMyContext();
 
   const config = {
@@ -43,24 +48,97 @@ const Header = () => {
     },
   };
 
-  const fetchAllUsers = async () => {
+  // Fetch friends list
+  const fetchFriends = async () => {
     try {
-      const { data } = await axios.post(
-        `${Api_URL}/mainchat/getUser`,
-        {},
-        config
-      );
-      if (data) {
-        setAllUsers(data);
+      const { data } = await axios.get(`${Api_URL}/friend/list`, config);
+      if (data.success) {
+        setFriends(data.data);
       }
     } catch (error) {
-      console.error("Error fetching data:", error);
+      console.error("Error fetching friends:", error);
+    }
+  };
+
+  // Fetch friend requests
+  const fetchFriendRequests = async () => {
+    try {
+      const { data } = await axios.get(`${Api_URL}/friend/requests`, config);
+      if (data.success) {
+        setFriendRequests(data.data);
+      }
+    } catch (error) {
+      console.error("Error fetching requests:", error);
     }
   };
 
   useEffect(() => {
-    fetchAllUsers();
-  }, []);
+    if (user) {
+      fetchFriends();
+      fetchFriendRequests();
+    }
+  }, [user]);
+
+  // Send friend request
+  const handleSendFriendRequest = async () => {
+    const email = friendEmailRef.current?.value;
+    if (!email) {
+      toast.error("Please enter an email");
+      return;
+    }
+
+    try {
+      const { data } = await axios.post(
+        `${Api_URL}/friend/send`,
+        { email },
+        config
+      );
+      if (data.success) {
+        toast.success(data.message);
+        friendEmailRef.current.value = "";
+        setShowAddFriend(false);
+      } else {
+        toast.error(data.message);
+      }
+    } catch (error) {
+      toast.error(error.response?.data?.message || "Error sending request");
+    }
+  };
+
+  // Accept friend request
+  const handleAcceptRequest = async (requestId) => {
+    try {
+      const { data } = await axios.post(
+        `${Api_URL}/friend/accept`,
+        { requestId },
+        config
+      );
+      if (data.success) {
+        toast.success("Friend request accepted!");
+        fetchFriendRequests();
+        fetchFriends();
+      }
+    } catch (error) {
+      toast.error("Error accepting request");
+    }
+  };
+
+  // Reject friend request
+  const handleRejectRequest = async (requestId) => {
+    try {
+      const { data} = await axios.post(
+        `${Api_URL}/friend/reject`,
+        { requestId },
+        config
+      );
+      if (data.success) {
+        toast.success("Friend request rejected");
+        fetchFriendRequests();
+      }
+    } catch (error) {
+      toast.error("Error rejecting request");
+    }
+  };
 
   const createNewChat = async (id) => {
     try {
@@ -129,6 +207,36 @@ const Header = () => {
       <div className="header-actions">
         <button
           className="header-btn primary"
+          onClick={() => setShowAddFriend(true)}
+        >
+          <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+            <path d="M16 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
+            <circle cx="9" cy="7" r="4"></circle>
+            <line x1="17" y1="11" x2="23" y2="11"></line>
+            <line x1="20" y1="8" x2="20" y2="14"></line>
+          </svg>
+          Add Friend
+        </button>
+        <button
+          className="header-btn secondary friend-requests-btn"
+          onClick={() => {
+            setShowRequests(true);
+            fetchFriendRequests();
+          }}
+        >
+          <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+            <path d="M16 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
+            <circle cx="9" cy="7" r="4"></circle>
+            <path d="M22 21v-2a4 4 0 0 0-3-3.87"></path>
+            <path d="M19 8v6m-3-3h6"></path>
+          </svg>
+          Requests
+          {friendRequests.length > 0 && (
+            <span className="friend-request-badge">{friendRequests.length}</span>
+          )}
+        </button>
+        <button
+          className="header-btn primary"
           onClick={handleNewChat}
         >
           <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
@@ -162,14 +270,81 @@ const Header = () => {
         </button>
       </div>
 
+      {/* Add Friend Modal */}
+      <Modal show={showAddFriend} onHide={() => setShowAddFriend(false)} centered className="custom-modal">
+        <Modal.Header closeButton>
+          <Modal.Title>Add Friend</Modal.Title>
+        </Modal.Header>
+        <Modal.Body>
+          <div className="add-friend-form">
+            <p className="modal-description">Enter your friend's email to send a friend request</p>
+            <input
+              ref={friendEmailRef}
+              type="email"
+              placeholder="friend@example.com"
+              className="friend-email-input"
+            />
+            <button onClick={handleSendFriendRequest} className="send-request-btn">
+              Send Request
+            </button>
+          </div>
+        </Modal.Body>
+      </Modal>
+
+      {/* Friend Requests Modal */}
+      <Modal show={showRequests} onHide={() => setShowRequests(false)} centered className="custom-modal">
+        <Modal.Header closeButton>
+          <Modal.Title>Friend Requests</Modal.Title>
+        </Modal.Header>
+        <Modal.Body>
+          <div className="friend-requests-list">
+            {friendRequests.length === 0 ? (
+              <p className="no-requests">No pending friend requests</p>
+            ) : (
+              friendRequests.map((request) => (
+                <div key={request._id} className="friend-request-item">
+                  <img
+                    src={`${Api_URL}/uploads/${request.sender.pic}`}
+                    alt={request.sender.name}
+                    className="user-avatar-small"
+                  />
+                  <div className="request-info">
+                    <p className="request-name">{request.sender.name}</p>
+                    <p className="request-email">{request.sender.email}</p>
+                  </div>
+                  <div className="request-actions">
+                    <button
+                      onClick={() => handleAcceptRequest(request._id)}
+                      className="accept-btn"
+                    >
+                      Accept
+                    </button>
+                    <button
+                      onClick={() => handleRejectRequest(request._id)}
+                      className="reject-btn"
+                    >
+                      Reject
+                    </button>
+                  </div>
+                </div>
+              ))
+            )}
+          </div>
+        </Modal.Body>
+      </Modal>
+
+      {/* New Chat Modal - Only show friends */}
       <Modal show={show} onHide={handleClose} centered className="custom-modal">
         <Modal.Header closeButton>
           <Modal.Title>{isGroupChat ? 'Create Group Chat' : 'Start New Chat'}</Modal.Title>
         </Modal.Header>
         <Modal.Body>
           <div className="users-list">
-            {allUsers &&
-              allUsers.map((e, ind) => {
+            {friends && friends.length === 0 && !isGroupChat && (
+              <p className="no-friends">No friends yet. Add friends to start chatting!</p>
+            )}
+            {friends &&
+              friends.map((e, ind) => {
                 return (
                   <div key={e._id} className="user-item">
                     {!isGroupChat ? (
