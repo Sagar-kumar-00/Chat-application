@@ -9,6 +9,9 @@ const messageRoute = require("../backend/routes/messageRoute");
 const friendRoute = require("../backend/routes/friendRoute");
 const userModel = require("./models/userModel");
 
+console.log("🚀🚀🚀 BACKEND STARTING - VERSION: MAY-8-2026-SOCKET-FIX-v2 🚀🚀🚀");
+console.log("📍 Module.exports at line 23 (FIXED VERSION)");
+
 let io; // Global socket.io instance
 
 // Export function to get io instance
@@ -19,8 +22,12 @@ const getIO = () => {
   return io;
 };
 
+console.log("✅ getIO function defined and ready to export");
+
 // Export immediately to avoid circular dependency issues
 module.exports = { getIO };
+
+console.log("✅ module.exports set at line 27 (EARLY EXPORT - CORRECT!)");
 
 app.use(cors());
 
