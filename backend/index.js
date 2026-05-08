@@ -3,11 +3,6 @@ const app = express();
 const dotEnv = require("dotenv");
 const mongoose = require("mongoose");
 const cors = require("cors");
-const userRoutes = require("../backend/routes/userRoutes");
-const chatRoutes = require("../backend/routes/chatRoute");
-const messageRoute = require("../backend/routes/messageRoute");
-const friendRoute = require("../backend/routes/friendRoute");
-const userModel = require("./models/userModel");
 
 console.log("🚀🚀🚀 BACKEND STARTING - VERSION: MAY-8-2026-SOCKET-FIX-v2 🚀🚀🚀");
 console.log("📍 Module.exports at line 23 (FIXED VERSION)");
@@ -27,7 +22,16 @@ console.log("✅ getIO function defined and ready to export");
 // Export immediately to avoid circular dependency issues
 module.exports = { getIO };
 
-console.log("✅ module.exports set at line 27 (EARLY EXPORT - CORRECT!)");
+console.log("✅ module.exports set BEFORE loading routes (CIRCULAR DEPENDENCY FIX!)");
+
+// Load routes AFTER export to prevent circular dependency
+const userRoutes = require("../backend/routes/userRoutes");
+const chatRoutes = require("../backend/routes/chatRoute");
+const messageRoute = require("../backend/routes/messageRoute");
+const friendRoute = require("../backend/routes/friendRoute");
+const userModel = require("./models/userModel");
+
+console.log("✅ Routes loaded successfully after export");
 
 app.use(cors());
 
