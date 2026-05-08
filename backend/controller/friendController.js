@@ -123,11 +123,19 @@ const sendFriendRequest = async (req, res) => {
       const sockets = await io.in(receiverRoom).fetchSockets();
       console.log(`Found ${sockets.length} socket(s) in room ${receiverRoom}`);
       
+      if (sockets.length === 0) {
+        console.log("⚠️ WARNING: Receiver is not connected. Request will not be delivered in real-time.");
+      } else {
+        sockets.forEach((s, idx) => {
+          console.log(`Socket ${idx + 1}: ID=${s.id}, Rooms=${Array.from(s.rooms)}`);
+        });
+      }
+      
       io.to(receiverRoom).emit("friend request received", populatedRequest);
-      console.log("Socket event emitted successfully");
+      console.log("✅ Socket event 'friend request received' emitted to room:", receiverRoom);
       console.log("===================");
     } catch (socketError) {
-      console.log("Socket error:", socketError.message);
+      console.log("❌ Socket error:", socketError.message);
     }
 
     return res.status(201).send({

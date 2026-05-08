@@ -56,6 +56,13 @@ const accessChat = async (req, res) => {
 //@access          Protected
 const fetchChats = async (req, res) => {
   try {
+    if (!req.user || !req.user._id) {
+      return res.status(401).send({ 
+        success: false, 
+        message: "User not authenticated" 
+      });
+    }
+
     Chat.find({ users: { $elemMatch: { $eq: req.user._id } } })
       .populate("users", "-password")
       .populate("groupAdmin", "-password")
@@ -69,8 +76,11 @@ const fetchChats = async (req, res) => {
         res.status(200).send(results);
       });
   } catch (error) {
-    res.status(400);
-    throw new Error(error.message);
+    console.error("Error fetching chats:", error);
+    res.status(400).send({ 
+      success: false, 
+      message: error.message 
+    });
   }
 };
 
