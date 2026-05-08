@@ -19,6 +19,9 @@ const getIO = () => {
   return io;
 };
 
+// Export immediately to avoid circular dependency issues
+module.exports = { getIO };
+
 app.use(cors());
 
 dotEnv.config();
@@ -153,5 +156,3 @@ function setupSocketIO(server) {
   });
   });
 }
-
-module.exports = { getIO };
