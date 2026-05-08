@@ -87,12 +87,24 @@ function setupSocketIO(server) {
   io.on("connection", (socket) => {
   console.log("Connected to socket.io");
 
-  socket.on("disconnect", (reason) => {
-    if (reason === "ping timeout") {
-      // Perform actions when a ping timeout occurs
-      // console.log("Ping timeout occurred for :", socket.id);
-      // Perform custom cleanup or other operations
-      // For example, you might remove the disconnected socket from a data structure or update a database
+  socket.on("disconnect", async (reason) => {
+    console.log("Socket disconnected:", socket.id, "Reason:", reason);
+    
+    // Find user by socketId and set them offline
+    try {
+      const user = await userModel.findOne({ socketId: socket.id });
+      if (user) {
+        await userModel.findByIdAndUpdate(user._id, { 
+          isOnline: false,
+          socketId: null 
+        });
+        console.log("User went offline:", user.email);
+        
+        // Notify all connected clients to refresh their chat list
+        socket.broadcast.emit("user online", "world");
+      }
+    } catch (error) {
+      console.error("Error handling disconnect:", error);
     }
   });
 
@@ -103,7 +115,7 @@ function setupSocketIO(server) {
     socket.emit("connected", socket.id);
     await userModel.findByIdAndUpdate(
       { _id: userData?._id },
-      { isOnline: true }
+      { isOnline: true, socketId: socket.id }
     );
     socket.broadcast.emit("user online", "world");
   });
@@ -141,19 +153,20 @@ function setupSocketIO(server) {
   });
 
   socket.on("setup leave", async (userData) => {
-    console.log("userData", userData);
+    console.log("User leaving:", userData?.email);
     await userModel.findByIdAndUpdate(
       { _id: userData?._id },
-      { isOnline: false }
+      { isOnline: false, socketId: null }
     );
     socket.broadcast.emit("user online", "world");
     socket.leave(userData._id);
   });
 
   socket.on("leaving", async (userData) => {
+    console.log("User leaving:", userData?.email);
     await userModel.findByIdAndUpdate(
       { _id: userData?._id },
-      { isOnline: false }
+      { isOnline: false, socketId: null }
     );
     socket.broadcast.emit("user online", "world");
     socket.leave(userData._id);
