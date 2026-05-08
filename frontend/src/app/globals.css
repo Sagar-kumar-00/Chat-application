@@ -1362,6 +1362,7 @@ object-fit: cover;
         padding: 16px 20px;
         border-radius: 0;
         margin-bottom: 0;
+        overflow: visible;
     }
 
     .app-title {
@@ -1381,6 +1382,7 @@ object-fit: cover;
         width: 100%;
         flex-wrap: wrap;
         gap: 8px;
+        overflow: visible;
     }
 
     .header-btn {
@@ -1390,8 +1392,8 @@ object-fit: cover;
         flex: 0 0 auto;
     }
 
-    /* Hide button text on mobile, show only icons */
-    .header-btn span {
+    /* Hide button text on mobile, show only icons (but keep badges) */
+    .header-btn > span:not(.friend-request-badge):not(.notification-badge) {
         display: none;
     }
 
@@ -1401,7 +1403,7 @@ object-fit: cover;
         margin: 0;
     }
 
-    /* Keep badges visible */
+    /* Keep badges visible and properly positioned */
     .friend-request-badge {
         top: -6px;
         right: -6px;
