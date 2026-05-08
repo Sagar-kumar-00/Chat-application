@@ -1549,6 +1549,10 @@ object-fit: cover;
         height: 44px;
     }
 
+    .chat-list {
+        padding-bottom: 80px; /* Space for fixed input on mobile */
+    }
+
     .message-bubble {
         max-width: 85%;
     }
@@ -1611,6 +1615,10 @@ object-fit: cover;
 
     .chat-list-header h2 {
         font-size: 16px;
+    }
+
+    .chat-list {
+        padding-bottom: 80px; /* Space for fixed input on mobile */
     }
 
     .chat-item {
