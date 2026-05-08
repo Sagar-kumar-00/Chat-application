@@ -24,6 +24,7 @@ export const MyContext = ({ children }) => {
   const [notifications, setNotifications] = useState([]);
   const[loading,setLoading] = useState(false);
   const [socket, setSocket] = useState(null);
+  const [socketUserId, setSocketUserId] = useState(null); // Track which user socket is connected for
 
   useEffect(() => {
     const userInfo = JSON.parse(localStorage.getItem("loggedUser"));
@@ -63,7 +64,8 @@ export const MyContext = ({ children }) => {
   };
 
   useEffect(() => {
-    if (user && pathname === "/home") {
+    const userId = user?._id;
+    if (userId && pathname === "/home") {
       fetchUnreadCounts();
     }
   }, [user?._id, pathname]);
@@ -117,8 +119,18 @@ export const MyContext = ({ children }) => {
   // }, []);
 
   useEffect(() => {
-    if (user && pathname === "/home") {
-      console.log("🔌 Initializing socket for user:", user._id);
+    const userId = user?._id;
+    
+    // Only setup socket if we have a user, we're on /home, and socket isn't already connected for this user
+    if (userId && pathname === "/home" && socketUserId !== userId) {
+      console.log("🔌 Initializing socket for user:", userId);
+      
+      // Disconnect old socket if it exists
+      if (socket) {
+        console.log("🔌 Disconnecting old socket");
+        socket.disconnect();
+      }
+      
       const newSocket = io(Api_URL);
       
       newSocket.on("connect", () => {
@@ -130,7 +142,7 @@ export const MyContext = ({ children }) => {
       
       newSocket.on("connected", (data) => {
         console.log("✅ Socket connected with ID:", data);
-        console.log("📍 User joined room:", user._id);
+        console.log("📍 User joined room:", userId);
         sendSocketID(data);
       });
       
@@ -140,23 +152,25 @@ export const MyContext = ({ children }) => {
       });
       
       setSocket(newSocket);
+      setSocketUserId(userId);
       console.log("✅ Socket set in context state");
 
       return () => {
-        if (newSocket) {
-          console.log("🔌 Cleaning up socket connection");
-          newSocket.emit("setup leave", user);
-          newSocket.disconnect();
-        }
+        console.log("🔌 Cleanup function called");
+        // Don't disconnect on every render - only when component unmounts
       };
-    } else {
-      if (socket) {
-        socket.emit("setup leave", user);
-        socket.disconnect();
-        setSocket(null);
-      }
+    }
+    
+    // Disconnect when leaving /home or logging out
+    if (pathname !== "/home" && socket) {
+      console.log("🔌 Leaving /home, disconnecting socket");
+      socket.emit("setup leave", user);
+      socket.disconnect();
+      setSocket(null);
+      setSocketUserId(null);
     }
   }, [user?._id, pathname]);
+
 
   return (
     <>

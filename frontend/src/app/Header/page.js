@@ -81,8 +81,8 @@ const Header = () => {
 
   // Listen for real-time friend request notifications
   useEffect(() => {
-    if (!socket) {
-      console.log("❌ Socket not available yet in Header");
+    if (!socket || !socket.connected) {
+      console.log("❌ Socket not available or not connected yet in Header");
       return;
     }
 
@@ -92,20 +92,28 @@ const Header = () => {
 
     const handleFriendRequest = (request) => {
       console.log("🎉 Friend request received via socket:", request);
-      setFriendRequests((prev) => [request, ...prev]);
+      setFriendRequests((prev) => {
+        // Check if request already exists to avoid duplicates
+        const exists = prev.some(r => r._id === request._id);
+        if (exists) {
+          console.log("⚠️ Request already in list, skipping");
+          return prev;
+        }
+        return [request, ...prev];
+      });
       toast.info(`${request.sender.name} sent you a friend request!`);
     };
 
     socket.on("friend request received", handleFriendRequest);
 
     // Test listener setup
-    console.log("Listener registered for 'friend request received' event");
+    console.log("✅ Listener registered for 'friend request received' event");
 
     return () => {
-      console.log("Cleaning up friend request listener");
+      console.log("🧹 Cleaning up friend request listener");
       socket.off("friend request received", handleFriendRequest);
     };
-  }, [socket]);
+  }, [socket?.connected, socket?.id]);
 
   // Send friend request
   const handleSendFriendRequest = async () => {
