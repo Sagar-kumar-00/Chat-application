@@ -1461,19 +1461,15 @@ object-fit: cover;
     .messages-area {
         flex: 1;
         overflow-y: auto;
+        overflow-x: hidden;
         padding: 12px;
-        padding-bottom: 80px; /* Space for fixed input */
     }
 
     .message-input-container {
-        position: fixed;
-        bottom: 0;
-        left: 0;
-        right: 0;
+        flex-shrink: 0;
         padding: 12px;
         background: rgb(32, 32, 33);
         border-top: 1px solid rgb(52, 52, 52);
-        z-index: 100;
     }
 
     /* Hide hamburger button on mobile */
@@ -1549,10 +1545,6 @@ object-fit: cover;
         height: 44px;
     }
 
-    .chat-list {
-        padding-bottom: 80px; /* Space for fixed input on mobile */
-    }
-
     .message-bubble {
         max-width: 85%;
     }
@@ -1615,10 +1607,6 @@ object-fit: cover;
 
     .chat-list-header h2 {
         font-size: 16px;
-    }
-
-    .chat-list {
-        padding-bottom: 80px; /* Space for fixed input on mobile */
     }
 
     .chat-item {
@@ -1916,40 +1904,6 @@ object-fit: cover;
 
     .chat-item.active {
         background: rgb(52, 52, 52);
-    }
-}
-
-/* Keyboard visibility handling for mobile */
-@media (max-width: 768px) {
-    /* When keyboard is open, use dynamic viewport */
-    .home-container {
-        height: 100dvh; /* Dynamic viewport height */
-        min-height: -webkit-fill-available;
-    }
-
-    .chat-layout {
-        height: calc(100dvh - 140px);
-        min-height: -webkit-fill-available;
-    }
-
-    /* Ensure messages scroll properly when keyboard opens */
-    .messages-area {
-        max-height: calc(100dvh - 220px);
-        overflow-y: auto;
-        overflow-x: hidden;
-        scroll-behavior: smooth;
-        -webkit-overflow-scrolling: touch;
-    }
-
-    /* Input container stays fixed at bottom even with keyboard */
-    .message-input-container {
-        position: fixed;
-        bottom: 0;
-        left: 0;
-        right: 0;
-        z-index: 9999;
-        transform: translateZ(0); /* Hardware acceleration */
-        background: rgb(32, 32, 33);
     }
 }
 
